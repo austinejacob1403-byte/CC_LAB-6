@@ -16,6 +16,7 @@ pipeline {
             steps {
                 sh '''
                 docker network create app-network || true
+
                 docker rm -f backend1 backend2 || true
 
                 docker run -d --name backend1 --network app-network backend-app
@@ -35,7 +36,11 @@ pipeline {
                   -p 80:80 \
                   nginx
 
+                # wait for nginx to fully start
+                sleep 5
+
                 docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+
                 docker exec nginx-lb nginx -s reload
                 '''
             }
